@@ -54,6 +54,35 @@
             opacity: 0;
             transform: scale(0.8);
         }
+
+        /* Escena inicial full-screen */
+        #scene0 {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .start-button {
+            font-family: 'Press Start 2P', cursive;
+            padding: 20px 40px;
+            font-size: 20px;
+            background: transparent;
+            color: white;
+            border: 4px solid white;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-shadow: 2px 2px 0px #000;
+            box-shadow: 4px 4px 0px white;
+        }
+
+        .start-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 8px 8px 0px white;
+        }
         
         h1 {
             color: #fff;
@@ -238,11 +267,11 @@
         }
         
         #scene1{
-            padding: 30vh 0;
+            padding: 25vh 0 0 0;
         }
 
         .gone{
-            display:none;
+            display:none !important;
         }
 
         .gift-content {
@@ -333,8 +362,12 @@
         <img id="previewImage" src="" alt="Preview">
     </div>
     <div class="container">
+        <!-- Escena 0: Pantalla inicial -->
+        <div id="scene0" class="scene active">
+            <button id="startBtn" class="start-button">EMPEZAR</button>
+        </div>
         <!-- Escena 1: Tarta de cumpleaños -->
-        <div id="scene1" class="scene active">
+        <div id="scene1" class="scene">
             <h1>FELIZ CUMPLEAÑOS<br>MAYTE</h1>
             <div class="cake-container" onclick="blowCandles()">
                 <div class="cake">
@@ -364,7 +397,7 @@
         
         <!-- Escena 2: Regalos -->
         <div id="scene2" class="scene">
-            <h1>AQUÍ TIENES TUS REGALOS!</h1>
+            <h1>ABRE TUS REGALOS!</h1>
             <div class="gifts-container">
                 <!-- Regalo 1: Restaurante -->
                 <div class="gift-box" onclick="openGift(1)">
@@ -535,11 +568,15 @@
                         document.body.removeChild(link);
                         window.URL.revokeObjectURL(url);
                     });
-            } else if (giftNumber === 1 || giftNumber === 3) {
+            } else if (giftNumber === 1) {
+                const previewDialog = document.getElementById('previewDialog');
+                const previewImage = document.getElementById('previewImage');
+                previewImage.src = 'assets/restaurante.png';
+            } else if (giftNumber === 3) {
                 const previewDialog = document.getElementById('previewDialog');
                 const previewImage = document.getElementById('previewImage');
                 previewImage.src = 'assets/tickets.png';
-            }
+            } 
         }
 
         function openGift(giftNumber) {
@@ -553,6 +590,7 @@
                 if (giftNumber === 1 || giftNumber === 3) {
                     const previewDialog = document.getElementById('previewDialog');
                     giftContent.addEventListener('mousemove', (e) => {
+                        handleGiftContent(giftNumber);
                         previewDialog.style.display = 'block';
                         previewDialog.style.left = (e.pageX + 10) + 'px';
                         previewDialog.style.top = (e.pageY + 10) + 'px';
@@ -560,12 +598,37 @@
                     giftContent.addEventListener('mouseleave', () => {
                         previewDialog.style.display = 'none';
                     });
-                    handleGiftContent(giftNumber);
                 } else if (giftNumber === 2) {
                     giftContent.addEventListener('click', () => handleGiftContent(giftNumber));
                 }
             }
         }
+    </script>
+    <script>
+        // Wire start button after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+                startBtn.addEventListener('click', () => {
+                    // hide scene0 and call existing startExperience logic
+                    const scene0 = document.getElementById('scene0');
+                    const scene1 = document.getElementById('scene1');
+                    if (scene0 && scene1) {
+                        setTimeout(() => {
+                            scene0.classList.add('gone');
+                            scene1.classList.add('active');
+                            const bgMusic = document.getElementById('background');
+                            if (bgMusic) {
+                                try { bgMusic.volume = 0.5; } catch {};
+                                bgMusic.play().catch(e => console.log('Error reproducir bg:', e));
+                            }
+                        }, 400);
+                        scene0.classList.remove('active');
+                        scene0.classList.add('fade-out');
+                    }
+                });
+            }
+        });
     </script>
 </body>
 </html>
