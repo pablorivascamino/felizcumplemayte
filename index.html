@@ -186,6 +186,12 @@
             margin-top: 30px;
         }
         
+        @keyframes attemptOpen {
+            0% { transform: translateY(-10px) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+            100% { transform: translateY(-10px) scale(1); }
+        }
+
         .gift-box {
             width: 150px;
             cursor: pointer;
@@ -194,6 +200,10 @@
         
         .gift-box:hover {
             transform: translateY(-10px);
+        }
+
+        .gift-box.attempting {
+            animation: attemptOpen 0.2s ease;
         }
         
         .gift {
@@ -448,7 +458,7 @@
                         </div>
                         <div class="gift-content">🍽️</div>
                     </div>
-                    <div class="gift-label">Válido por una cena en La Tagliatella</div>
+                    <div class="gift-label">Válido por una cena en "La Tagliatella"</div>
                 </div>
                 
                 <!-- Regalo 2: Música -->
@@ -626,12 +636,18 @@
         function openGift(giftNumber) {
             const giftBox = document.querySelectorAll('.gift-box')[giftNumber - 1];
             if (!giftBox.classList.contains('opened')) {
-                // Reproducir sonido de golpe
+                // Reproducir sonido de golpe y añadir animación
                 const breakSound = document.getElementById('breakSound');
                 if (breakSound) {
                     breakSound.currentTime = 0;
                     breakSound.play();
                 }
+
+                // Añadir y remover la clase de animación
+                giftBox.classList.add('attempting');
+                setTimeout(() => {
+                    giftBox.classList.remove('attempting');
+                }, 200); // Tiempo igual a la duración de la animación
 
                 // Registrar el tiempo del click
                 const currentTime = Date.now();
