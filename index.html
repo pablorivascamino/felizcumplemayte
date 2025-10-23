@@ -385,6 +385,7 @@
 <body>
     <canvas id="confetti-canvas"></canvas>
     <audio id="openItemSound" src="assets/open-item.mp3"></audio>
+    <audio id="breakSound" src="assets/break.mp3"></audio>
     <audio id="wind" src="assets/wind.mp3"></audio>
     <audio id="background" src="assets/background.mp3"></audio>
     <button id="muteButton" class="mute-button">
@@ -615,27 +616,63 @@
             } 
         }
 
+        // Objeto para almacenar los timestamps de clicks para cada regalo
+        const giftClickTimes = {
+            1: [],
+            2: [],
+            3: []
+        };
+
         function openGift(giftNumber) {
             const giftBox = document.querySelectorAll('.gift-box')[giftNumber - 1];
             if (!giftBox.classList.contains('opened')) {
-                giftBox.classList.add('opened');
-                document.getElementById('openItemSound').play();
+                // Reproducir sonido de golpe
+                const breakSound = document.getElementById('breakSound');
+                if (breakSound) {
+                    breakSound.currentTime = 0;
+                    breakSound.play();
+                }
 
-                // Agregar evento hover después de abrir el regalo
-                const giftContent = giftBox.querySelector('.gift-content');
-                if (giftNumber === 1 || giftNumber === 3) {
-                    const previewDialog = document.getElementById('previewDialog');
-                    giftContent.addEventListener('mousemove', (e) => {
-                        handleGiftContent(giftNumber);
-                        previewDialog.style.display = 'block';
-                        previewDialog.style.left = (e.pageX + 10) + 'px';
-                        previewDialog.style.top = (e.pageY + 10) + 'px';
-                    });
-                    giftContent.addEventListener('mouseleave', () => {
-                        previewDialog.style.display = 'none';
-                    });
-                } else if (giftNumber === 2) {
-                    giftContent.addEventListener('click', () => handleGiftContent(giftNumber));
+                // Registrar el tiempo del click
+                const currentTime = Date.now();
+                giftClickTimes[giftNumber].push(currentTime);
+
+                // Mantener solo los últimos 10 clicks
+                if (giftClickTimes[giftNumber].length > 10) {
+                    giftClickTimes[giftNumber].shift();
+                }
+
+                // Verificar si hay 10 clicks y si están dentro del límite de tiempo
+                if (giftClickTimes[giftNumber].length === 10) {
+                    const timeDiff = giftClickTimes[giftNumber][9] - giftClickTimes[giftNumber][0];
+                    if (timeDiff < 2000) { // 2 segundos = 2000ms
+                        // Abrir el regalo
+                        giftBox.classList.add('opened');
+                        document.getElementById('openItemSound').play();
+
+                        // Reiniciar los tiempos de click para este regalo
+                        giftClickTimes[giftNumber] = [];
+
+                        // Agregar evento hover después de abrir el regalo
+                        const giftContent = giftBox.querySelector('.gift-content');
+                        if (giftNumber === 1 || giftNumber === 3) {
+                            const previewDialog = document.getElementById('previewDialog');
+                            giftContent.addEventListener('mousemove', (e) => {
+                                handleGiftContent(giftNumber);
+                                previewDialog.style.display = 'block';
+                                previewDialog.style.left = (e.pageX + 10) + 'px';
+                                previewDialog.style.top = (e.pageY + 10) + 'px';
+                            });
+                            giftContent.addEventListener('mouseleave', () => {
+                                previewDialog.style.display = 'none';
+                            });
+                        } else if (giftNumber === 2) {
+                            giftContent.addEventListener('click', () => handleGiftContent(giftNumber));
+                        }
+                    } else {
+                        // Reiniciar los tiempos si no se logró en el tiempo requerido
+                        giftClickTimes[giftNumber] = [currentTime];
+                    }
                 }
             }
         }
