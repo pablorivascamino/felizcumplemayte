@@ -325,6 +325,35 @@
             display: block;
         }
         
+        .mute-button {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            z-index: 2001;
+            width: 40px;
+            height: 40px;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.3s ease;
+        }
+
+        .mute-button:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .mute-button svg {
+            width: 100%;
+            height: 100%;
+            fill: white;
+        }
+
+        .mute-button.muted svg path.wave {
+            display: none;
+        }
+
         @media (max-width: 768px) {
             h1 {
                 font-size: 1.5em;
@@ -358,6 +387,13 @@
     <audio id="openItemSound" src="assets/open-item.mp3"></audio>
     <audio id="wind" src="assets/wind.mp3"></audio>
     <audio id="background" src="assets/background.mp3"></audio>
+    <button id="muteButton" class="mute-button">
+        <svg viewBox="0 0 24 24">
+            <path d="M12,4L6,10H3V14H6L12,20V4Z"/>
+            <path class="wave" d="M16.5,12C16.5,10.23 15.5,8.71 14,7.97V16C15.5,15.29 16.5,13.76 16.5,12Z"/>
+            <path class="wave" d="M19,12C19,9.24 17.54,6.83 15.38,5.51V18.46C17.54,17.14 19,14.73 19,12Z"/>
+        </svg>
+    </button>
     <div id="previewDialog" class="preview-dialog">
         <img id="previewImage" src="" alt="Preview">
     </div>
@@ -606,8 +642,28 @@
     </script>
     <script>
         // Wire start button after DOM is ready
+        let isMuted = false;
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const muteButton = document.getElementById('muteButton');
+            const allAudio = document.querySelectorAll('audio');
+            
+            muteButton.classList.toggle('muted', isMuted);
+            
+            allAudio.forEach(audio => {
+                audio.volume = isMuted ? 0 : (audio.id === 'background' ? 0.75 : 1);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const startBtn = document.getElementById('startBtn');
+            const muteButton = document.getElementById('muteButton');
+
+            if (muteButton) {
+                muteButton.addEventListener('click', toggleMute);
+            }
+
             if (startBtn) {
                 startBtn.addEventListener('click', () => {
                     // hide scene0 and call existing startExperience logic
@@ -619,7 +675,7 @@
                             scene1.classList.add('active');
                             const bgMusic = document.getElementById('background');
                             if (bgMusic) {
-                                try { bgMusic.volume = 0.5; } catch {};
+                                try { bgMusic.volume = isMuted ? 0 : 0.75; } catch {};
                                 bgMusic.play().catch(e => console.log('Error reproducir bg:', e));
                             }
                         }, 400);
