@@ -276,6 +276,25 @@
         .gift-box.opened .gift-label {
             opacity: 1;
         }
+
+        .preview-dialog {
+            display: none;
+            position: fixed;
+            pointer-events: none;
+            background: white;
+            padding: 10px;
+            border: 4px solid #000;
+            box-shadow: 4px 4px 0px #000;
+            z-index: 1000;
+            width: 200px;
+            height: auto;
+        }
+
+        .preview-dialog img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
         
         @media (max-width: 768px) {
             h1 {
@@ -310,6 +329,9 @@
     <audio id="openItemSound" src="assets/open-item.mp3"></audio>
     <audio id="wind" src="assets/wind.mp3"></audio>
     <audio id="background" src="assets/background.mp3"></audio>
+    <div id="previewDialog" class="preview-dialog">
+        <img id="previewImage" src="" alt="Preview">
+    </div>
     <div class="container">
         <!-- Escena 1: Tarta de cumpleaños -->
         <div id="scene1" class="scene active">
@@ -499,11 +521,49 @@
             }, 1500);
         }
         
+        function handleGiftContent(giftNumber) {
+            if (giftNumber === 2) {
+                fetch('assets/song.mp3')
+                    .then(response => response.blob())
+                    .then(blob => {
+                        const url = window.URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = 'song.mp3';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        window.URL.revokeObjectURL(url);
+                    });
+            } else if (giftNumber === 1 || giftNumber === 3) {
+                const previewDialog = document.getElementById('previewDialog');
+                const previewImage = document.getElementById('previewImage');
+                previewImage.src = 'assets/tickets.png';
+            }
+        }
+
         function openGift(giftNumber) {
             const giftBox = document.querySelectorAll('.gift-box')[giftNumber - 1];
             if (!giftBox.classList.contains('opened')) {
                 giftBox.classList.add('opened');
                 document.getElementById('openItemSound').play();
+
+                // Agregar evento hover después de abrir el regalo
+                const giftContent = giftBox.querySelector('.gift-content');
+                if (giftNumber === 1 || giftNumber === 3) {
+                    const previewDialog = document.getElementById('previewDialog');
+                    giftContent.addEventListener('mousemove', (e) => {
+                        previewDialog.style.display = 'block';
+                        previewDialog.style.left = (e.pageX + 10) + 'px';
+                        previewDialog.style.top = (e.pageY + 10) + 'px';
+                    });
+                    giftContent.addEventListener('mouseleave', () => {
+                        previewDialog.style.display = 'none';
+                    });
+                    handleGiftContent(giftNumber);
+                } else if (giftNumber === 2) {
+                    giftContent.addEventListener('click', () => handleGiftContent(giftNumber));
+                }
             }
         }
     </script>
