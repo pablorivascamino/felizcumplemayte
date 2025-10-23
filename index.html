@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feliz Cumpleaños Mayte</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+        
+        #confetti-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -999;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            width: 100%;
+            padding: 20px;
+        }
+        
+        .scene {
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .scene.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        .scene.fade-out {
+            opacity: 0;
+            transform: scale(0.8);
+        }
+        
+        h1 {
+            color: #fff;
+            font-size: 2.5em;
+            text-shadow: 4px 4px 0px #000;
+            margin-bottom: 50px;
+            padding-bottom: 5vh;
+            animation: pulse 2s infinite;
+        }
+
+        h2 {
+            color: #000;
+            font-size: 1.2em;
+            margin-top: 50px;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .cake-container {
+            cursor: pointer;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+        
+        .cake-container:hover {
+            transform: scale(1.1);
+        }
+        
+        .cake {
+            width: 200px;
+            height: 150px;
+            background: #ff69b4;
+            border: 4px solid #000;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 8px 8px 0px #000;
+        }
+        
+        .cake-layer {
+            width: 100%;
+            height: 50px;
+            background: #ff1493;
+            border-bottom: 4px solid #000;
+        }
+        
+        .cake-top {
+            width: 100%;
+            height: 20px;
+            background: #fff;
+            border-bottom: 4px solid #000;
+        }
+        
+        .candles {
+            display: flex;
+            justify-content: space-around;
+            position: absolute;
+            top: -40px;
+            width: 100%;
+            padding: 0 30px;
+        }
+        
+        .candle {
+            width: 10px;
+            height: 40px;
+            background: #fff;
+            border: 2px solid #000;
+            position: relative;
+        }
+        
+        .flame {
+            width: 16px;
+            height: 20px;
+            background: #ff6600;
+            border: 2px solid #000;
+            position: absolute;
+            top: -22px;
+            left: -5px;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            animation: flicker 0.5s infinite alternate;
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .flame.blown {
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        @keyframes flicker {
+            0% { transform: scaleY(1); }
+            100% { transform: scaleY(1.2); }
+        }
+        
+        .gifts-container {
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+        
+        .gift-box {
+            width: 150px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .gift-box:hover {
+            transform: translateY(-10px);
+        }
+        
+        .gift {
+            width: 150px;
+            height: 150px;
+            position: relative;
+            margin: 0 auto 20px;
+        }
+        
+        .gift-base {
+            width: 100%;
+            height: 120px;
+            background: #ff6b6b;
+            border: 4px solid #000;
+            box-shadow: 6px 6px 0px #000;
+            position: relative;
+            transition: all 0.8s ease;
+        }
+        
+        .gift-box.opened .gift-base {
+            transform: rotateX(180deg);
+            opacity: 0;
+        }
+        
+        .gift-ribbon-v {
+            width: 20px;
+            height: 100%;
+            background: #ffd700;
+            border: 2px solid #000;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .gift-ribbon-h {
+            width: 100%;
+            height: 20px;
+            background: #ffd700;
+            border: 2px solid #000;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .gift-lid {
+            width: 100%;
+            height: 30px;
+            background: #ff5252;
+            border: 4px solid #000;
+            position: absolute;
+            top: -30px;
+            box-shadow: 6px 6px 0px #000;
+            transition: all 0.8s ease;
+        }
+        
+        .gift-box.opened .gift-lid {
+            transform: translateY(-50px) rotateZ(-20deg);
+            opacity: 0;
+        }
+        
+        .gift-bow {
+            width: 40px;
+            height: 20px;
+            background: #ffd700;
+            border: 2px solid #000;
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50%;
+        }
+        
+        #scene1{
+            padding: 30vh 0;
+        }
+
+        .gone{
+            display:none;
+        }
+
+        .gift-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+            transition: all 0.8s ease;
+            font-size: 4em;
+        }
+        
+        .gift-box.opened .gift-content {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+        }
+        
+        .gift-label {
+            font-size: 0.8em;
+            color: #fff;
+            text-shadow: 2px 2px 0px #000;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+            opacity: 0;
+            transition: opacity 0.8s ease 0.5s;
+        }
+        
+        .gift-box.opened .gift-label {
+            opacity: 1;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5em;
+            }
+            
+            .gifts-container {
+                gap: 30px;
+            }
+            
+            .gift-box {
+                width: 120px;
+            }
+            
+            .gift {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .gift-base {
+                height: 100px;
+            }
+            
+            .gift-content {
+                font-size: 3em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="confetti-canvas"></canvas>
+    <audio id="openItemSound" src="assets/open-item.mp3"></audio>
+    <audio id="wind" src="assets/wind.mp3"></audio>
+    <audio id="background" src="assets/background.mp3"></audio>
+    <div class="container">
+        <!-- Escena 1: Tarta de cumpleaños -->
+        <div id="scene1" class="scene active">
+            <h1>FELIZ CUMPLEAÑOS<br>MAYTE</h1>
+            <div class="cake-container" onclick="blowCandles()">
+                <div class="cake">
+                    <div class="candles">
+                        <div class="candle">
+                            <div class="flame"></div>
+                        </div>
+                        <div class="candle">
+                            <div class="flame"></div>
+                        </div>
+                        <div class="candle">
+                            <div class="flame"></div>
+                        </div>
+                        <div class="candle">
+                            <div class="flame"></div>
+                        </div>
+                        <div class="candle">
+                            <div class="flame"></div>
+                        </div>
+                    </div>
+                    <div class="cake-top"></div>
+                    <div class="cake-layer"></div>
+                </div>
+            </div>
+            <h2>SOPLA LAS VELAS!</h2>
+        </div>
+        
+        <!-- Escena 2: Regalos -->
+        <div id="scene2" class="scene">
+            <h1>AQUÍ TIENES TUS REGALOS!</h1>
+            <div class="gifts-container">
+                <!-- Regalo 1: Restaurante -->
+                <div class="gift-box" onclick="openGift(1)">
+                    <div class="gift">
+                        <div class="gift-lid">
+                            <div class="gift-bow"></div>
+                        </div>
+                        <div class="gift-base">
+                            <div class="gift-ribbon-v"></div>
+                            <div class="gift-ribbon-h"></div>
+                        </div>
+                        <div class="gift-content">🍽️</div>
+                    </div>
+                    <div class="gift-label">Válido por una cena en La Tagliatella</div>
+                </div>
+                
+                <!-- Regalo 2: Música -->
+                <div class="gift-box" onclick="openGift(2)">
+                    <div class="gift">
+                        <div class="gift-lid">
+                            <div class="gift-bow"></div>
+                        </div>
+                        <div class="gift-base" style="background: #4ecdc4;">
+                            <div class="gift-ribbon-v"></div>
+                            <div class="gift-ribbon-h"></div>
+                        </div>
+                        <div class="gift-content">🎵</div>
+                    </div>
+                    <div class="gift-label">Una tontería que hice hace tiempo</div>
+                </div>
+                
+                <!-- Regalo 3: Entrada -->
+                <div class="gift-box" onclick="openGift(3)">
+                    <div class="gift">
+                        <div class="gift-lid">
+                            <div class="gift-bow"></div>
+                        </div>
+                        <div class="gift-base" style="background: #95e1d3;">
+                            <div class="gift-ribbon-v"></div>
+                            <div class="gift-ribbon-h"></div>
+                        </div>
+                        <div class="gift-content">🎫</div>
+                    </div>
+                    <div class="gift-label">Válido para ver a Pablo hacer el simio</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuración del confeti
+        const canvas = document.getElementById('confetti-canvas');
+        const ctx = canvas.getContext('2d');
+        let confettiPieces = [];
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+        
+        // Ajustar el tamaño del canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+        
+        // Clase para las partículas de confeti
+        class ConfettiPiece {
+            constructor() {
+                this.reset();
+            }
+            
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = -20;
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+                this.width = Math.random() * 10 + 5;
+                this.height = Math.random() * 6 + 4;
+                this.velocity = {
+                    x: Math.random() * 6 - 3,
+                    y: Math.random() * 3 + 2
+                };
+                this.rotation = Math.random() * 360;
+                this.rotationSpeed = Math.random() * 10 - 5;
+            }
+            
+            update() {
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.rotation += this.rotationSpeed;
+                
+                if (this.y > canvas.height) {
+                    this.reset();
+                }
+            }
+            
+            draw() {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation * Math.PI / 180);
+                ctx.fillStyle = this.color;
+                ctx.fillRect(-this.width / 2, -this.height / 2, this.width, this.height);
+                ctx.restore();
+            }
+        }
+        
+        // Crear partículas iniciales
+        function createConfetti(amount = 100) {
+            for (let i = 0; i < amount; i++) {
+                confettiPieces.push(new ConfettiPiece());
+            }
+        }
+        
+        // Animar el confeti
+        function animateConfetti() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            confettiPieces.forEach(piece => {
+                piece.update();
+                piece.draw();
+            });
+            
+            requestAnimationFrame(animateConfetti);
+        }
+        
+        // Iniciar confeti
+        createConfetti();
+        animateConfetti();
+
+        let candlesBlown = false;
+        
+        function blowCandles() {
+            if (candlesBlown) return;
+            candlesBlown = true;
+            
+            const flames = document.querySelectorAll('.flame');
+            document.getElementById('wind').play();
+            flames.forEach((flame, index) => {
+                setTimeout(() => {
+                    flame.classList.add('blown');
+                }, index * 150);
+            });
+            
+            setTimeout(() => {
+                const scene1 = document.getElementById('scene1');
+                const scene2 = document.getElementById('scene2');
+                
+                scene1.classList.add('fade-out');
+                
+                setTimeout(() => {
+                    scene1.classList.remove('active');
+                    scene1.classList.add('gone');
+                    scene2.classList.add('active');
+                }, 800);
+            }, 1500);
+        }
+        
+        function openGift(giftNumber) {
+            const giftBox = document.querySelectorAll('.gift-box')[giftNumber - 1];
+            if (!giftBox.classList.contains('opened')) {
+                giftBox.classList.add('opened');
+                document.getElementById('openItemSound').play();
+            }
+        }
+    </script>
+</body>
+</html>
