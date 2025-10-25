@@ -103,6 +103,11 @@
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.05); }
         }
+
+        @keyframes pulse2 {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
         
         .cake-container {
             cursor: pointer;
@@ -292,11 +297,21 @@
             opacity: 0;
             transition: all 0.8s ease;
             font-size: 4em;
+            cursor: pointer;
         }
         
         .gift-box.opened .gift-content {
             transform: translate(-50%, -50%) scale(1);
             opacity: 1;
+        }
+
+        @keyframes playingPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .gift-content.playing {
+            animation: playingPulse 1s infinite;
         }
         
         .gift-label {
@@ -458,7 +473,7 @@
                         </div>
                         <div class="gift-content">🍽️</div>
                     </div>
-                    <div class="gift-label">Válido por una cena en "La Tagliatella"</div>
+                    <div class="gift-label">Vale por una cena en "La Tagliatella"</div>
                 </div>
                 
                 <!-- Regalo 2: Música -->
@@ -471,9 +486,10 @@
                             <div class="gift-ribbon-v"></div>
                             <div class="gift-ribbon-h"></div>
                         </div>
-                        <div class="gift-content">🎵</div>
+                        <div class="gift-content">🎫</div>
                     </div>
-                    <div class="gift-label">Una tontería que hice hace tiempo</div>
+                    <div class="gift-label">Vale para ver a Pablo hacer el simio</div>
+
                 </div>
                 
                 <!-- Regalo 3: Entrada -->
@@ -486,9 +502,9 @@
                             <div class="gift-ribbon-v"></div>
                             <div class="gift-ribbon-h"></div>
                         </div>
-                        <div class="gift-content">🎫</div>
+                        <div class="gift-content">🎵</div>
                     </div>
-                    <div class="gift-label">Válido para ver a Pablo hacer el simio</div>
+                    <div class="gift-label">No me convence nada pero se que a te va a hacer ilusión</div>
                 </div>
             </div>
         </div>
@@ -601,8 +617,10 @@
             }, 1500);
         }
         
+        let customSong = null;
+
         function handleGiftContent(giftNumber) {
-            if (giftNumber === 2) {
+            if (giftNumber === 3) {
                 fetch('assets/song.mp3')
                     .then(response => response.blob())
                     .then(blob => {
@@ -619,11 +637,47 @@
                 const previewDialog = document.getElementById('previewDialog');
                 const previewImage = document.getElementById('previewImage');
                 previewImage.src = 'assets/restaurante.png';
-            } else if (giftNumber === 3) {
+            } else if (giftNumber === 2) {
                 const previewDialog = document.getElementById('previewDialog');
                 const previewImage = document.getElementById('previewImage');
                 previewImage.src = 'assets/tickets.png';
             } 
+        }
+
+        function setupGiftThreeAudio(giftContent) {
+            // Preparar el audio personalizado
+            customSong = new Audio('assets/song.mp3');
+            const bgMusic = document.getElementById('background');
+
+            function playCustomSong() {
+                if (bgMusic) {
+                    bgMusic.pause();
+                }
+                giftContent.classList.add('playing');
+                customSong.volume = isMuted ? 0 : 0.75;
+                customSong.play();
+            }
+
+            function resumeBackground() {
+                giftContent.classList.remove('playing');
+                if (bgMusic) {
+                    bgMusic.volume = isMuted ? 0 : 0.75;
+                    bgMusic.play();
+                }
+            }
+
+            // Eventos para la canción personalizada
+            customSong.addEventListener('ended', resumeBackground);
+
+            // Click en el contenido del regalo
+            giftContent.addEventListener('click', () => {
+                if (customSong.paused) {
+                    playCustomSong();
+                } else {
+                    customSong.pause();
+                    resumeBackground();
+                }
+            });
         }
 
         // Objeto para almacenar los timestamps de clicks para cada regalo
@@ -671,7 +725,7 @@
 
                         // Agregar evento hover después de abrir el regalo
                         const giftContent = giftBox.querySelector('.gift-content');
-                        if (giftNumber === 1 || giftNumber === 3) {
+                        if (giftNumber === 1 || giftNumber === 2) {
                             const previewDialog = document.getElementById('previewDialog');
                             giftContent.addEventListener('mousemove', (e) => {
                                 handleGiftContent(giftNumber);
@@ -682,8 +736,13 @@
                             giftContent.addEventListener('mouseleave', () => {
                                 previewDialog.style.display = 'none';
                             });
-                        } else if (giftNumber === 2) {
+                        } else if (giftNumber === 3) {
                             giftContent.addEventListener('click', () => handleGiftContent(giftNumber));
+                        }
+
+                        // Configurar el audio para el regalo 3
+                        if (giftNumber === 3) {
+                            setupGiftThreeAudio(giftContent);
                         }
                     } else {
                         // Reiniciar los tiempos si no se logró en el tiempo requerido
