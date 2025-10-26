@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="./assets/noteIcon.png" />
     <title>Feliz Cumpleaños Mayte</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -296,7 +297,7 @@
             transform: translate(-50%, -50%) scale(0);
             opacity: 0;
             transition: all 0.8s ease;
-            font-size: 4em;
+            font-size: 2.7em;
             cursor: pointer;
         }
         
@@ -312,6 +313,15 @@
 
         .gift-content.playing {
             animation: playingPulse 1s infinite;
+        }
+
+        /* Icon images inside gift-content */
+        .gift-icon {
+            width: 1.6em;
+            height: 1.6em;
+            display: block;
+            margin: 0 auto;
+            pointer-events: none; /* let clicks reach the parent */
         }
         
         .gift-label {
@@ -471,7 +481,7 @@
                             <div class="gift-ribbon-v"></div>
                             <div class="gift-ribbon-h"></div>
                         </div>
-                        <div class="gift-content">🍽️</div>
+                        <div class="gift-content"><img class="gift-icon" src="assets/foodIcon.png" alt="food"></div>
                     </div>
                     <div class="gift-label">Vale por una cena en "La Tagliatella"</div>
                 </div>
@@ -486,7 +496,7 @@
                             <div class="gift-ribbon-v"></div>
                             <div class="gift-ribbon-h"></div>
                         </div>
-                        <div class="gift-content">🎫</div>
+                        <div class="gift-content"><img class="gift-icon" src="assets/ticketIcon.png" alt="ticket"></div>
                     </div>
                     <div class="gift-label">Vale para ver a Pablo hacer el simio</div>
 
@@ -502,7 +512,7 @@
                             <div class="gift-ribbon-v"></div>
                             <div class="gift-ribbon-h"></div>
                         </div>
-                        <div class="gift-content">🎵</div>
+                        <div class="gift-content"><img class="gift-icon" src="assets/noteIcon.png" alt="note"></div>
                     </div>
                     <div class="gift-label">No me convence nada pero se que a te va a hacer ilusión</div>
                 </div>
