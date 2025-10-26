@@ -557,6 +557,7 @@
         const canvas = document.getElementById('confetti-canvas');
         const ctx = canvas.getContext('2d');
         let confettiPieces = [];
+        let lastOppendedTime = 0;
         const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
         
         // Ajustar el tamaño del canvas
@@ -700,11 +701,13 @@
 
             // Click en el contenido del regalo
             giftContent.addEventListener('click', () => {
-                if (customSong.paused) {
-                    playCustomSong();
-                } else {
-                    customSong.pause();
-                    resumeBackground();
+                if (Date.now()-lastOppendedTime > 1000){
+                    if (customSong.paused) {
+                        playCustomSong();
+                    } else {
+                        customSong.pause();
+                        resumeBackground();
+                    }
                 }
             });
         }
@@ -746,6 +749,7 @@
                     const timeDiff = giftClickTimes[giftNumber][9] - giftClickTimes[giftNumber][0];
                     if (timeDiff < 2000) { // 2 segundos = 2000ms
                         // Abrir el regalo
+                        lastOppendedTime = Date.now();
                         giftBox.classList.add('opened');
                         document.getElementById('openItemSound').play();
 
@@ -757,10 +761,12 @@
                         if (giftNumber === 1 || giftNumber === 2) {
                             const previewDialog = document.getElementById('previewDialog');
                             giftContent.addEventListener('mousemove', (e) => {
-                                handleGiftContent(giftNumber);
-                                previewDialog.style.display = 'block';
-                                previewDialog.style.left = (e.pageX + 10) + 'px';
-                                previewDialog.style.top = (e.pageY + 10) + 'px';
+                                if (Date.now()-lastOppendedTime > 1000){
+                                    handleGiftContent(giftNumber);
+                                    previewDialog.style.display = 'block';
+                                    previewDialog.style.left = (e.pageX + (giftNumber === 5 ? 10: -90)) + 'px';
+                                    previewDialog.style.top = (e.pageY + 10) + 'px';
+                                }
                             });
                             giftContent.addEventListener('mouseleave', () => {
                                 previewDialog.style.display = 'none';
