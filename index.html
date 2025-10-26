@@ -620,20 +620,7 @@
         let customSong = null;
 
         function handleGiftContent(giftNumber) {
-            if (giftNumber === 3) {
-                fetch('assets/song.mp3')
-                    .then(response => response.blob())
-                    .then(blob => {
-                        const url = window.URL.createObjectURL(blob);
-                        const link = document.createElement('a');
-                        link.href = url;
-                        link.download = 'song.mp3';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                        window.URL.revokeObjectURL(url);
-                    });
-            } else if (giftNumber === 1) {
+            if (giftNumber === 1) {
                 const previewDialog = document.getElementById('previewDialog');
                 const previewImage = document.getElementById('previewImage');
                 previewImage.src = 'assets/restaurante.png';
