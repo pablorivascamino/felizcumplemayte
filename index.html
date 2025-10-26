@@ -394,7 +394,34 @@
             display: none;
         }
 
-        @media (max-width: 768px) {
+        @media only screen and (max-width: 600px) {
+            h1 {
+                font-size: 1.2em;
+            }
+            
+            .gifts-container {
+                gap: 30px;
+            }
+            
+            .gift-box {
+                width: 90px;
+            }
+            
+            .gift {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .gift-base {
+                height: 90px;
+            }
+            
+            .gift-content {
+                font-size: 2.5em;
+            }
+        }
+
+        @media (max-width: 768px) and (min-width: 600px) {
             h1 {
                 font-size: 1.5em;
             }
